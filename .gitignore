@@ -1,0 +1,26 @@
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+logs/
+
+# Telegram sessions
+*.session
+*.session-journal
+*.session-wal
+*.session-shm
+session/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Node.js
+node_modules/
+
+# Build files
+dist/
+coverage/
