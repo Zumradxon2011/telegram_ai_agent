@@ -8,22 +8,22 @@ import { authMiddleware } from './middlewares/auth.js';
 import { handleStart, handleHelp, handleStatus } from './handlers/commands.js';
 import { runAgentTask } from '../agent/agentService.js';
 import { approveAction, rejectAction } from '../services/approvalService.js';
-import { 
-  getMemories, 
-  clearConversationHistory 
+import {
+  getMemories,
+  clearConversationHistory
 } from '../services/memoryService.js';
-import { 
-  getAutoReplyConfig, 
-  updateAutoReplyConfig 
+import {
+  getAutoReplyConfig,
+  updateAutoReplyConfig
 } from '../services/autoReplyService.js';
-import { 
-  downloadTelegramFile, 
-  transcribeVoiceAudio, 
+import {
+  downloadTelegramFile,
+  transcribeVoiceAudio,
   transcribeAudioWithGemini,
   splitMessageChunks,
   convertAudioToMp3,
   enhanceAudioForSpeech,
-  isFFmpegAvailable 
+  isFFmpegAvailable
 } from '../services/whisperService.js';
 import { refineTranscribedTextWithGemini } from '../services/voiceReplyService.js';
 
@@ -132,7 +132,11 @@ bot.callbackQuery('view_memories', async (ctx) => {
 // Xabar yuborishni tasdiqlash (Approval)
 bot.callbackQuery(/^act_app:(.+)$/, async (ctx) => {
   const actionId = ctx.match[1];
-  await ctx.answerCallbackQuery({ text: 'Tasdiqlanmoqda...' });
+  try {
+    await ctx.answerCallbackQuery({ text: 'Tasdiqlanmoqda...' });
+  } catch (callbackError) {
+    logger.warn(`Callback javobida tarmoq xatosi: ${callbackError.message}`);
+  }
   try {
     const res = await approveAction(actionId, ctx.from.id);
     await ctx.editMessageReplyMarkup({ reply_markup: undefined });
@@ -222,7 +226,7 @@ bot.on(['message:voice', 'message:video_note'], async (ctx) => {
   // Foydalanuvchiga bot ishlayotganini bildirish (typing)
   await ctx.replyWithChatAction('typing');
   const typingInterval = setInterval(() => {
-    ctx.replyWithChatAction('typing').catch(() => {});
+    ctx.replyWithChatAction('typing').catch(() => { });
   }, 4000);
 
   const tempDir = path.join(os.tmpdir(), 'my_agnet_voices');
@@ -333,7 +337,7 @@ bot.on(['message:voice', 'message:video_note'], async (ctx) => {
     await ctx.reply(
       '⚠️ Ovozli xabarni matnga aylantirishda xatolik yuz berdi. Iltimos, qaytadan urinib ko‘ring.',
       { reply_parameters: { message_id: messageId } }
-    ).catch(() => {});
+    ).catch(() => { });
   } finally {
     // 6. Vaqtinchalik audio fayllarni xavfsiz o'chirish (tozalash)
     const filesToClean = [tempDownloadedPath, convertedMp3Path].filter(Boolean);
@@ -357,7 +361,7 @@ bot.on('message:text', async (ctx) => {
   // Foydalanuvchiga bot fikrlayotganini ko'rsatish
   await ctx.replyWithChatAction('typing');
   const typingInterval = setInterval(() => {
-    ctx.replyWithChatAction('typing').catch(() => {});
+    ctx.replyWithChatAction('typing').catch(() => { });
   }, 4000);
 
   try {
